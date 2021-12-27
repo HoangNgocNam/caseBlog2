@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PostRequest;
+use App\Models\Post;
 use App\Models\User;
 use App\Repositories\CategoryRepository;
 use App\Repositories\PostRepository;
@@ -21,19 +23,25 @@ class PostController extends Controller
     public function index()
     {
         $posts = $this->postRepository->getAll();
-        return view("post.list", compact("posts"));
+        return view("backend.post.list", compact("posts"));
     }
 
     public function create()
     {
         $users = User::all();
         $categories = $this->categoryRepository->getAll();
-        return view("post.create", compact("categories","users"));
+        return view("backend.post.create", compact("categories", "users"));
     }
 
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            "title" => "required|min:6|max:200",
+            "content" => "required",
+            "user_id" => "required",
+        ]);
         $this->postRepository->create($request);
+        toastr()->success('Thành Công');
         return redirect()->route("posts.index");
     }
 
@@ -41,8 +49,8 @@ class PostController extends Controller
     {
         $user = User::all();
         $categories = $this->categoryRepository->getAll();
-      $post = $this->postRepository->getById($id);
-      return view("post.detail", compact("post","user","categories"));
+        $post = $this->postRepository->getById($id);
+        return view("backend.post.detail", compact("post", "user", "categories"));
     }
 
     public function edit($id)
@@ -50,12 +58,18 @@ class PostController extends Controller
         $users = User::all();
         $post = $this->postRepository->getById($id);
         $categories = $this->categoryRepository->getAll();
-        return view("post.update", compact("post","categories","users"));
+        return view("backend.post.update", compact("post", "categories", "users"));
     }
 
     public function update(Request $request, $id)
     {
-        $this->postRepository->update($id,$request);
+        $validated = $request->validate([
+            "title" => "required|min:6|max:200",
+            "content" => "required",
+            "user_id" => "required",
+        ]);
+        $this->postRepository->update($id, $request);
+        toastr()->success('Thành Công');
         return redirect()->route("posts.index");
     }
 

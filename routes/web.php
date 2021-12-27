@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('backend.layout.master');
 });
 Route::prefix('/users')->group(function (){
     Route::get('/',[UserController::class,"index"])->name("users.index");
@@ -28,7 +28,7 @@ Route::prefix('/users')->group(function (){
     Route::get('/{id}/update',[UserController::class,"edit"])->name("users.update");
     Route::post('/{id}/update',[UserController::class,"update"])->name("users.update");
 });
-Route::prefix('/posts')->group(function (){
+Route::middleware('check-auth')->prefix('/posts')->group(function (){
     Route::get('/',[PostController::class,"index"])->name("posts.index");
     Route::get('/create',[PostController::class,"create"])->name("posts.create");
     Route::post('/create',[PostController::class,"store"])->name("posts.create");
@@ -37,10 +37,11 @@ Route::prefix('/posts')->group(function (){
     Route::get('/{id}/update',[PostController::class,"edit"])->name("posts.update");
     Route::post('/{id}/update',[PostController::class,"update"])->name("posts.update");
 });
-Route::get('/login',[AuthController::class,"showFormLogin"])->name("login.showFormLogin");
+
+Route::get('/login',[AuthController::class,"showFormLogin"])->name("showFormLogin");
 Route::post('/login',[AuthController::class,"login"])->name("login");
 Route::get('/logout',[AuthController::class,"logOut"])->name("logout");
-Route::get('/register',[AuthController::class,"showFormRegister"])->name("register.showFormRegister");
+Route::get('/register',[AuthController::class,"showFormRegister"])->name("showFormRegister");
 Route::post('/register',[AuthController::class,"register"])->name("register");
 Route::get('/reset',[AuthController::class,"showFromResetPassword"])->name("reset");
 Route::post('/reset',[AuthController::class,"resetPassword"])->name("reset.password");

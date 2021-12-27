@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PostRequest;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,16 +14,17 @@ class AuthController extends Controller
 {
     public function showFormLogin()
     {
-        return view("auth.login");
+        return view("backend.auth.login");
     }
 
     public function login(Request $request)
     {
         $data = $request->only("email", "password");
         if (Auth::attempt($data)) {
+            toastr()->success('Thành Công');
             return redirect()->route("posts.index");
         } else {
-            echo "sai mat khau";
+            echo "Sai tài Khoản Hoặc Mật khẩu";
         }
     }
 
@@ -29,12 +32,13 @@ class AuthController extends Controller
     {
         Session::flush();
         Auth::logout();
-        return redirect()->route("login.showFormLogin");
+        toastr()->success('Thành Công');
+        return redirect()->route("showFormLogin");
     }
 
     public function showFormRegister()
     {
-        return view("auth.register");
+        return view("backend.auth.register");
     }
 
     public function register(Request $request)
@@ -42,12 +46,13 @@ class AuthController extends Controller
         $data = $request->only("name", "email", "password");
         $data['password'] = Hash::make($request->password);
         User::query()->create($data);
-        return redirect()->route("login.showFormLogin");
+        toastr()->success('Thành Công');
+        return redirect()->route("showFormLogin");
     }
 
     public function showFromResetPassword()
     {
-        return view("auth.fromReset");
+        return view("backend.auth.fromReset");
     }
 
     public function resetPassword(Request $request)
@@ -57,9 +62,10 @@ class AuthController extends Controller
         if (Hash::check($request->currenPassword,$currenPassword)){
             Auth::user()->password = Hash::make($newPassword);
             Auth::user()->save();
-            return redirect()->route("login.showFormLogin");
+            toastr()->success('Thành Công');
+            return redirect()->route("showFormLogin");
         }else{
-            echo " Nhap lai mat khau cu";
+            echo " Nhập Lại Mật Khẩu Cũ Bạn Ơi";
         }
     }
 }
